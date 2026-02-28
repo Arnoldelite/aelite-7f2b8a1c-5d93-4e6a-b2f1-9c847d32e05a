@@ -5,6 +5,7 @@ import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { AuditModule } from '../audit/audit.module';
+import { RolesGuard } from '@org/auth';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { AuditModule } from '../audit/audit.module';
     OrganizationsModule,
     AuditModule,
   ],
-  providers: [TasksService],
+  providers: [TasksService, RolesGuard],
   controllers: [TasksController],
   exports: [TasksService],
 })
