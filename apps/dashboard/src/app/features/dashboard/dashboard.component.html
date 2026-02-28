@@ -1,0 +1,227 @@
+<!-- Keyboard Shortcuts Modal -->
+@if (showShortcuts()) {
+  <div class="shortcuts-overlay" (click)="showShortcuts.set(false)">
+    <div class="shortcuts-dialog" (click)="$event.stopPropagation()">
+      <div class="shortcuts-header">
+        <h3>Keyboard Shortcuts</h3>
+        <button type="button" class="shortcuts-close" (click)="showShortcuts.set(false)">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="shortcuts-list">
+        <div class="shortcut-item"><kbd>N</kbd><span>Create new task</span></div>
+        <div class="shortcut-item"><kbd>C</kbd><span>Toggle chart</span></div>
+        <div class="shortcut-item"><kbd>?</kbd><span>Show/hide shortcuts</span></div>
+        <div class="shortcut-item"><kbd>Esc</kbd><span>Close modal/dialog</span></div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Task Create/Edit Modal -->
+@if (isModalOpen()) {
+  <app-task-form
+    [task]="editingTask()"
+    (saved)="onTaskSaved($event)"
+    (cancelled)="closeModal()"
+  />
+}
+
+<div class="dashboard-shell" [class.dark-shell]="isDark$ | async">
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <!-- Sidebar toggle -->
+      <button type="button" class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <div class="header-logo">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="10" fill="url(#hLogoGrad)"/>
+          <path d="M10 13h16M10 18h10M10 23h13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="27" cy="23" r="4" fill="white" opacity="0.9"/>
+          <path d="M25 23l1.5 1.5L28.5 21" stroke="url(#hLogoGrad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="hLogoGrad" x1="0" y1="0" x2="36" y2="36">
+              <stop stop-color="#6366f1"/>
+              <stop offset="1" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="header-app-name">TaskFlow</span>
+      </div>
+    </div>
+
+    <!-- Header Right -->
+    <div class="header-right">
+      <!-- Shortcuts hint -->
+      <button
+        type="button"
+        class="shortcuts-hint-btn"
+        (click)="showShortcuts.set(true)"
+        data-tooltip="Keyboard shortcuts (?)"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </button>
+
+      <!-- Create Task Button -->
+      @if (canManage) {
+        <button type="button" class="create-task-btn" (click)="openCreateModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>New Task</span>
+        </button>
+      }
+
+      <!-- Theme Toggle -->
+      <app-theme-toggle />
+
+      <!-- User Avatar + Info -->
+      <div class="user-info">
+        <div class="user-avatar-header">{{ userInitials }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ userFullName }}</span>
+          <span class="user-role-badge" [class]="roleBadgeClass">{{ roleLabel }}</span>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <button type="button" class="logout-btn" (click)="logout()" data-tooltip="Logout">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Body: sidebar + main -->
+  <div class="dashboard-body">
+    <!-- Left Sidebar -->
+    <aside class="sidebar" [class.sidebar-collapsed]="!isSidebarOpen()">
+      <div class="sidebar-inner">
+        <!-- Filters -->
+        <app-task-filters />
+
+        <!-- View Toggles -->
+        <div class="sidebar-section">
+          <h4 class="sidebar-section-title">View</h4>
+          <div class="view-toggles">
+            <button
+              type="button"
+              class="view-toggle-btn"
+              [class.view-toggle-active]="showChart()"
+              (click)="toggleChart()"
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Analytics Chart
+            </button>
+
+            @if (canManage) {
+              <button
+                type="button"
+                class="view-toggle-btn"
+                [class.view-toggle-active]="showAuditLog()"
+                (click)="toggleAuditLog()"
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Audit Log
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="sidebar-section">
+          <h4 class="sidebar-section-title">Quick Stats</h4>
+          <div class="quick-stats">
+            <div class="stat-row stat-todo">
+              <div class="stat-dot"></div>
+              <span class="stat-label">Todo</span>
+            </div>
+            <div class="stat-row stat-progress">
+              <div class="stat-dot"></div>
+              <span class="stat-label">In Progress</span>
+            </div>
+            <div class="stat-row stat-done">
+              <div class="stat-dot"></div>
+              <span class="stat-label">Done</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading tasks...</p>
+        </div>
+      }
+
+      <!-- Error State -->
+      @else if (loadError()) {
+        <div class="error-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="error-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <h3>Failed to load tasks</h3>
+          <p>{{ loadError() }}</p>
+          <button type="button" class="retry-btn" (click)="retryLoad()">Try Again</button>
+        </div>
+      }
+
+      <!-- Dashboard Content -->
+      @else {
+        <!-- Chart Section -->
+        @if (showChart()) {
+          <section class="content-section">
+            <app-task-chart />
+          </section>
+        }
+
+        <!-- Kanban Board -->
+        <section class="content-section board-section">
+          <div class="board-header">
+            <h2 class="board-title">Task Board</h2>
+            @if (canManage) {
+              <button type="button" class="create-task-btn-sm" (click)="openCreateModal()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Create Task
+                <kbd class="shortcut-key">N</kbd>
+              </button>
+            }
+          </div>
+          <app-task-board
+            (editTask)="openEditModal($event)"
+            (createTask)="openCreateModal()"
+          />
+        </section>
+
+        <!-- Audit Log Section -->
+        @if (showAuditLog() && canManage) {
+          <section class="content-section">
+            <app-audit-log />
+          </section>
+        }
+      }
+    </main>
+  </div>
+</div>

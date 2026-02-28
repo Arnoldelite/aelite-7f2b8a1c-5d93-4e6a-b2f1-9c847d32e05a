@@ -1,0 +1,255 @@
+<div class="filters-container">
+  <div class="filters-header">
+    <h3 class="filters-title">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="filters-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+      </svg>
+      Filters
+    </h3>
+    @if (hasActiveFilters()) {
+      <button type="button" class="clear-btn" (click)="clearFilters()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        Clear
+      </button>
+    }
+  </div>
+
+  <form [formGroup]="filterForm" class="filters-form">
+    <!-- Search -->
+    <div class="filter-group">
+      <label class="filter-label">Search</label>
+      <div class="search-wrapper">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          type="text"
+          formControlName="search"
+          placeholder="Search tasks..."
+          class="filter-input search-input"
+        />
+      </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Status</label>
+      <select formControlName="status" class="filter-select">
+        <option value="">All Statuses</option>
+        <option value="todo">Todo</option>
+        <option value="in-progress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Category</label>
+      <select formControlName="category" class="filter-select">
+        <option value="">All Categories</option>
+        <option value="Work">Work</option>
+        <option value="Personal">Personal</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <!-- Priority Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Priority</label>
+      <select formControlName="priority" class="filter-select">
+        <option value="">All Priorities</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Active filter badges -->
+  @if (hasActiveFilters()) {
+    <div class="active-filters">
+      @if (filterForm.get('search')?.value) {
+        <span class="filter-badge">
+          "{{ filterForm.get('search')?.value }}"
+        </span>
+      }
+      @if (filterForm.get('status')?.value) {
+        <span class="filter-badge status-badge">
+          {{ filterForm.get('status')?.value }}
+        </span>
+      }
+      @if (filterForm.get('category')?.value) {
+        <span class="filter-badge category-badge">
+          {{ filterForm.get('category')?.value }}
+        </span>
+      }
+      @if (filterForm.get('priority')?.value) {
+        <span class="filter-badge priority-badge">
+          {{ filterForm.get('priority')?.value }}
+        </span>
+      }
+    </div>
+  }
+</div>
+
+<style>
+  .filters-container {
+    padding: 1rem;
+  }
+
+  .filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .filters-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .filters-icon {
+    width: 1rem;
+    height: 1rem;
+    color: #6366f1;
+  }
+
+  .clear-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+
+  .clear-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  .clear-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+  }
+
+  .search-wrapper {
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
+
+  .filter-input,
+  .filter-select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+
+  .search-input {
+    padding-left: 2.25rem;
+  }
+
+  .filter-input:focus,
+  .filter-select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  .filter-select {
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.875rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .filter-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+
+  .status-badge {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+
+  .category-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .priority-badge {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.2);
+  }
+</style>

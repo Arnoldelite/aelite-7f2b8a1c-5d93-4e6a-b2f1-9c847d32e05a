@@ -1,0 +1,163 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" [attr.aria-label]="isEditMode ? 'Edit task' : 'Create task'">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-area">
+        <div class="modal-icon" [class.edit-icon]="isEditMode">
+          @if (isEditMode) {
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+          } @else {
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          }
+        </div>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Task' : 'Create New Task' }}</h2>
+      </div>
+      <button type="button" class="modal-close" (click)="onCancel()" aria-label="Close">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Error message -->
+    @if (error()) {
+      <div class="form-error-banner">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="task-form">
+      <!-- Title -->
+      <div class="form-field">
+        <label class="form-label" for="task-title">
+          Title <span class="required">*</span>
+        </label>
+        <input
+          id="task-title"
+          type="text"
+          formControlName="title"
+          placeholder="Enter task title..."
+          class="form-input"
+          [class.form-input-error]="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+        />
+        @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
+          <p class="field-error-msg">
+            @if (taskForm.get('title')?.errors?.['required']) { Title is required. }
+            @else if (taskForm.get('title')?.errors?.['minlength']) { Title must be at least 2 characters. }
+            @else if (taskForm.get('title')?.errors?.['maxlength']) { Title cannot exceed 200 characters. }
+          </p>
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="form-field">
+        <label class="form-label" for="task-desc">Description</label>
+        <textarea
+          id="task-desc"
+          formControlName="description"
+          placeholder="Add a description (optional)..."
+          rows="3"
+          class="form-textarea"
+        ></textarea>
+      </div>
+
+      <!-- Row: Status + Category -->
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="task-status">Status</label>
+          <select id="task-status" formControlName="status" class="form-select">
+            <option value="todo">Todo</option>
+            <option value="in-progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="task-category">Category</label>
+          <select id="task-category" formControlName="category" class="form-select">
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Priority -->
+      <div class="form-field">
+        <label class="form-label">Priority</label>
+        <div class="priority-buttons">
+          <label
+            class="priority-btn"
+            [class.priority-low-active]="taskForm.get('priority')?.value === 'low'"
+          >
+            <input type="radio" formControlName="priority" value="low" class="sr-only"/>
+            <span class="priority-dot priority-dot-low"></span>
+            Low
+          </label>
+          <label
+            class="priority-btn"
+            [class.priority-med-active]="taskForm.get('priority')?.value === 'medium'"
+          >
+            <input type="radio" formControlName="priority" value="medium" class="sr-only"/>
+            <span class="priority-dot priority-dot-med"></span>
+            Medium
+          </label>
+          <label
+            class="priority-btn"
+            [class.priority-high-active]="taskForm.get('priority')?.value === 'high'"
+          >
+            <input type="radio" formControlName="priority" value="high" class="sr-only"/>
+            <span class="priority-dot priority-dot-high"></span>
+            High
+          </label>
+        </div>
+      </div>
+
+      <!-- Assigned To -->
+      <div class="form-field">
+        <label class="form-label" for="task-assignee">Assigned To (User ID)</label>
+        <input
+          id="task-assignee"
+          type="text"
+          formControlName="assignedToId"
+          placeholder="User ID (optional)"
+          class="form-input"
+        />
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="onCancel()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn-save"
+          [disabled]="taskForm.invalid || loading()"
+        >
+          @if (loading()) {
+            <svg class="btn-spinner" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Saving...
+          } @else {
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            {{ isEditMode ? 'Update Task' : 'Create Task' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
