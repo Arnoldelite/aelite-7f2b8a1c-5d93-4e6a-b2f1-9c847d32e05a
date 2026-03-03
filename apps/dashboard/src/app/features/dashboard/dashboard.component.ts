@@ -13,6 +13,9 @@ import { CommonModule, AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { NgxParticlesModule } from '@tsparticles/angular';
+import { loadSlim } from '@tsparticles/slim';
+import type { Engine } from '@tsparticles/engine';
 
 import { AuthService } from '../../core/services/auth.service';
 import { TaskService } from '../../core/services/task.service';
@@ -34,6 +37,7 @@ import { IUser, Role } from '../../core/models/user.model';
   imports: [
     CommonModule,
     AsyncPipe,
+    NgxParticlesModule,
     TaskBoardComponent,
     TaskFormComponent,
     TaskChartComponent,
@@ -67,6 +71,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentUser = signal<IUser | null>(null);
 
   isDark$ = this.themeService.isDark$;
+
+  private readonly baseParticles = {
+    fpsLimit: 60,
+    interactivity: {
+      events: { onHover: { enable: false }, resize: { enable: true } },
+    },
+    particles: {
+      number: { value: 55, density: { enable: true } },
+      links: { enable: true, distance: 160, width: 1 },
+      move: {
+        enable: true,
+        speed: 0.6,
+        direction: 'none' as const,
+        random: true,
+        straight: false,
+        outModes: { default: 'bounce' as const },
+      },
+      size: { value: { min: 1, max: 3 } },
+      shape: { type: 'circle' },
+    },
+    background: { color: { value: 'transparent' } },
+    detectRetina: true,
+  };
+
+  // Lighter indigo for dark backgrounds
+  darkParticlesOptions = {
+    ...this.baseParticles,
+    particles: {
+      ...this.baseParticles.particles,
+      color: { value: '#818cf8' },
+      links: { ...this.baseParticles.particles.links, color: '#818cf8', opacity: 0.45 },
+      opacity: { value: { min: 0.35, max: 0.65 } },
+    },
+  };
+
+  // Deeper indigo for light backgrounds
+  lightParticlesOptions = {
+    ...this.baseParticles,
+    particles: {
+      ...this.baseParticles.particles,
+      color: { value: '#4338ca' },
+      links: { ...this.baseParticles.particles.links, color: '#4338ca', opacity: 0.4 },
+      opacity: { value: { min: 0.3, max: 0.55 } },
+    },
+  };
+
+  particlesInit = async (engine: Engine): Promise<void> => {
+    await loadSlim(engine);
+  };
 
   get canManage(): boolean {
     const role = this.currentUser()?.role;

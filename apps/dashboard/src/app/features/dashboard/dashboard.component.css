@@ -5,6 +5,15 @@
   height: 100vh;
   background: var(--bg-secondary);
   overflow: hidden;
+  position: relative;
+}
+
+/* Particles background layer */
+.dashboard-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Header */
@@ -18,6 +27,7 @@
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 8px var(--shadow-color);
+  position: relative;
   z-index: 50;
   gap: 1rem;
 }
@@ -224,6 +234,8 @@
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  position: relative;
+  z-index: 1;
 }
 
 /* Sidebar */

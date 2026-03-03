@@ -30,6 +30,23 @@
 }
 
 <div class="dashboard-shell" [class.dark-shell]="isDark$ | async">
+  <!-- Particles Background (recreated on theme toggle to pick up new colours) -->
+  @if (isDark$ | async) {
+    <ngx-particles
+      class="dashboard-particles"
+      id="dp-dark"
+      [options]="darkParticlesOptions"
+      [particlesInit]="particlesInit"
+    ></ngx-particles>
+  } @else {
+    <ngx-particles
+      class="dashboard-particles"
+      id="dp-light"
+      [options]="lightParticlesOptions"
+      [particlesInit]="particlesInit"
+    ></ngx-particles>
+  }
+
   <!-- Top Header -->
   <header class="top-header">
     <div class="header-left">
