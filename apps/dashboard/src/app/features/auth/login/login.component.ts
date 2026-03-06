@@ -119,9 +119,9 @@ export class LoginComponent implements OnInit {
 
   fillDemo(role: 'owner' | 'admin' | 'viewer'): void {
     const creds = {
-      owner: { email: 'owner@demo.com', password: 'password123' },
-      admin: { email: 'admin@demo.com', password: 'password123' },
-      viewer: { email: 'viewer@demo.com', password: 'password123' },
+      owner: { email: 'owner@acme.com', password: 'Password123!' },
+      admin: { email: 'admin@acme.com', password: 'Password123!' },
+      viewer: { email: 'viewer@acme.com', password: 'Password123!' },
     };
     this.loginForm.patchValue(creds[role]);
   }
